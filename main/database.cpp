@@ -939,7 +939,7 @@ LRESULT Database::windowProcNewProduct(HWND hwnd, UINT msg, WPARAM wParam,
         // Checking for non-Latin characters.
         for (wchar_t i = 0; bufferName[i] != L'\0'; i++) {
           wchar_t ch = bufferName[i];
-          if (bufferName[i] < L'!' || bufferName[i] > L'~') {
+          if (bufferName[i] < L' ' || bufferName[i] > L'~') {
             MessageBox(hwnd,
                        L"The Name field cannot contain non-Latin characters!",
                        L"Error", MB_ICONERROR);
