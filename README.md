@@ -26,7 +26,7 @@ The program provides the ability to import product data from CSV files, making i
 * <b>Data storage using SQLite3:</b><br />
 The program uses SQLite3 to store product data reliably and efficiently, which ensures high performance and database security.
 <div align="center">
-  <img src=" https://github.com/Ivanoka/summer_coursework_2023/blob/master/images/different_windows.png" alt="Different windows">
+  <img src="https://github.com/Ivanoka/summer_coursework_2023/blob/master/images/different_windows.png" alt="Different windows">
 </div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -60,6 +60,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- CONTACT -->
 ## Contact
-Ivan Tsitou - ivan.tsitou.work@gmail.com
+Ivan Tsitou - ivan.tsitou.work@gmail.com<br />
 Project Link: https://github.com/Ivanoka/summer_coursework_2023
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
