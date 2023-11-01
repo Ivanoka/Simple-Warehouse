@@ -29,14 +29,12 @@ The program uses SQLite3 to store product data reliably and efficiently, which e
   <img src="https://github.com/Ivanoka/summer_coursework_2023/blob/master/images/different_windows.png" alt="Different windows">
 </div>
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- TECHNOLOGY -->
 ### Built With
 * ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 * ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -47,14 +45,12 @@ Clone the repo
    ```sh
    git clone https://github.com/Ivanoka/summer_coursework_2023.git
    ```
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- LICENSE -->
 ## License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -62,4 +58,3 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## Contact
 Ivan Tsitou - ivan.tsitou.work@gmail.com<br />
 Project Link: https://github.com/Ivanoka/summer_coursework_2023
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
