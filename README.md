@@ -4,7 +4,7 @@
   <a href="https://github.com/Ivanoka/summer_coursework_2023">
     <img src="https://github.com/Ivanoka/summer_coursework_2023/blob/master/icons/mainIcon.png" alt="Logo" width="100" height="100">
   </a>
-  <h3 align="center">Summer coursework 2023</h3>
+  <h3 align="center">Summer Coursework 2023</h3>
   <h4 align="center">Software program to accounting for products in the warehouse.</h3>
 </div>
 
