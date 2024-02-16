@@ -7,6 +7,12 @@
 #include <thread>
 #include <vector>
 
+#include "model/databaseModel.h"
+#include "view/consoleView.h"
+#include "view/winapiView.h"
+#include "controller/controller.h"
+
+
 #include "sqlite3.h"
 #include "database.h"
 

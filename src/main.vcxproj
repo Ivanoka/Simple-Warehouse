@@ -138,12 +138,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="controller\controller.cpp" />
     <ClCompile Include="database.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="model\databaseModel.cpp" />
+    <ClCompile Include="view\consoleView.cpp" />
+    <ClCompile Include="view\winapiView.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="controller\controller.h" />
     <ClInclude Include="database.h" />
+    <ClInclude Include="model\databaseModel.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="view\consoleView.h" />
+    <ClInclude Include="view\winapiView.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />
