@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "../sqlite3/sqlite3.h"
+#include "sqlite3.h"
 
 #pragma comment(lib, "Shlwapi.lib")
 
