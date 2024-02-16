@@ -2,7 +2,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Ivanoka/summer_coursework_2023">
-    <img src="https://github.com/Ivanoka/summer_coursework_2023/blob/master/icons/mainIcon.png" alt="Logo" width="100" height="100">
+    <img src="resources/icons/mainIcon.png" alt="Logo" width="100" height="100">
   </a>
   <h3 align="center">Summer Coursework 2023</h3>
   <h4 align="center">Software program to accounting for products in the warehouse.</h3>
@@ -26,7 +26,7 @@ The program provides the ability to import product data from CSV files, making i
 * <b>Data storage using SQLite3:</b><br />
 The program uses SQLite3 to store product data reliably and efficiently, which ensures high performance and database security.
 <div align="center">
-  <img src="https://github.com/Ivanoka/summer_coursework_2023/blob/master/images/different_windows.png" alt="Different windows">
+  <img src="resources/images/differentWindows.png" alt="Different windows">
 </div>
 
 
