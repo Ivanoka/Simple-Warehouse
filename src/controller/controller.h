@@ -4,6 +4,9 @@
 #include <Windows.h>
 #include <conio.h>
 
+#include <chrono>
+#include <thread>
+
 #include "../model/databaseModel.h"
 #include "../view/consoleView.h"
 #include "../view/winapiView.h"
@@ -26,6 +29,7 @@ private:
     ESC = 27,
   };
 
+  void resizeEvent();
   void processInput();
 
  public:

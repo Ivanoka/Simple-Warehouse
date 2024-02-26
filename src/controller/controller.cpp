@@ -1,4 +1,25 @@
 ﻿#include "controller.h"
+
+void Controller::resizeEvent() {
+  HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+  // Get window width
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
+  GetConsoleScreenBufferInfo(hConsole, &csbi);
+  int consoleWidth = csbi.dwSize.X;
+
+  while (true) {
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    if (csbi.dwSize.X != consoleWidth) {
+      consoleWidth = csbi.dwSize.X;
+
+      consoleView.showMenu();
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+}
+
 void Controller::processInput() {
   consoleView.showMenu();
 
@@ -44,5 +65,8 @@ void Controller::processInput() {
 }
 
 void Controller::init() {
+  std::thread threadResizeEvent(&Controller::resizeEvent, this);
+  threadResizeEvent.detach();
+
   processInput();
 }
