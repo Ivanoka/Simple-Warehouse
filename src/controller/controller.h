@@ -29,6 +29,7 @@ private:
   void processInput();
 
  public:
+  void init();
 };
 
 #endif  // CONTROLLER_H

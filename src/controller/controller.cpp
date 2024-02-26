@@ -42,3 +42,7 @@ void Controller::processInput() {
     }
   }
 }
+
+void Controller::init() {
+  processInput();
+}
