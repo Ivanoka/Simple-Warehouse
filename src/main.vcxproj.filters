@@ -13,45 +13,57 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\Controller">
+      <UniqueIdentifier>{253b554b-624d-4d56-8861-453159e1871f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Model">
+      <UniqueIdentifier>{3f940bbd-3867-4ebd-a898-44b57852608f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\View">
+      <UniqueIdentifier>{ff336c19-2bca-4334-88fb-071fdbd01944}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Controller">
+      <UniqueIdentifier>{08349edc-cc58-4153-a1b6-7f98229f4d88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Model">
+      <UniqueIdentifier>{96dcad85-b00b-4d08-9a97-d56ca6b0d1fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\View">
+      <UniqueIdentifier>{e1b4d83a-f44b-4dcf-b342-2cb6d395780f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="database.cpp">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="controller\controller.cpp">
+      <Filter>Исходные файлы\Controller</Filter>
     </ClCompile>
     <ClCompile Include="model\databaseModel.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="controller\controller.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\Model</Filter>
     </ClCompile>
     <ClCompile Include="view\consoleView.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\View</Filter>
     </ClCompile>
     <ClCompile Include="view\winapiView.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\View</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="database.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="model\databaseModel.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="controller\controller.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="model\databaseModel.h">
+      <Filter>Файлы заголовков\Model</Filter>
     </ClInclude>
     <ClInclude Include="view\consoleView.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\View</Filter>
     </ClInclude>
     <ClInclude Include="view\winapiView.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\View</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
