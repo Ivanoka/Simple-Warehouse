@@ -1,7 +1,7 @@
 ﻿#include "consoleView.h"
 
-size_t ConsoleView::getLeftMargin()
-{
+// Private
+size_t ConsoleView::getLeftMargin() {
   HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
   // Get window width
@@ -16,6 +16,7 @@ size_t ConsoleView::getLeftMargin()
   }
 }
 
+// Public
 void ConsoleView::showMenu() {
   size_t leftMargin = getLeftMargin();
   std::string separator(134, static_cast<const char>(205));
@@ -64,4 +65,70 @@ void ConsoleView::showMenu() {
   // Closing line
   std::cout << margin << static_cast<const char>(200) << separator
             << static_cast<const char>(188) << std::endl;
+}
+
+void ConsoleView::showListItems(std::vector<Item>& itemList) {
+  size_t leftMargin = getLeftMargin();
+  std::string leftMarginStr(getLeftMargin(), ' ');
+
+  std::vector<std::string> columnNames{
+      std::string(1, static_cast<const char>(201)) +
+          std::string(15, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(203)) +
+          std::string(96, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(203)) +
+          std::string(7, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(203)) +
+          std::string(13, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(187)),
+
+      std::string(1, static_cast<const char>(186)) + " BARCODE       " +
+          std::string(1, static_cast<const char>(186)) +
+          " NAME                                                               "
+          "                            " +
+          std::string(1, static_cast<const char>(186)) + " STOCK " +
+          std::string(1, static_cast<const char>(186)) + " CHANGE TIME " +
+          std::string(1, static_cast<const char>(186)),
+
+      std::string(1, static_cast<const char>(200)) +
+          std::string(15, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(202)) +
+          std::string(96, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(202)) +
+          std::string(7, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(202)) +
+          std::string(13, static_cast<const char>(205)) +
+          std::string(1, static_cast<const char>(188)),
+  };
+
+  for (auto str : columnNames) {
+    std::cout << leftMarginStr << str << std::endl;
+  }
+
+  // Variables to display the time correctly
+  time_t unixChangeTime;
+  char buffer[11];
+  struct tm curChangeTime;
+
+  // Output the list of products as a loop
+  for (auto item : itemList) {
+    unixChangeTime = item.changeTime;
+    localtime_s(&curChangeTime, &unixChangeTime);
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d", &curChangeTime);
+
+    for (int i = 0; i < leftMargin; i++) {
+      std::cout << ' ';
+    }
+    std::cout << "  " << item.barcode << "   " << std::left << std::setw(94)
+              << item.name << "   " << std::right << std::setw(5) << item.stock
+              << "   " << std::setw(11) << buffer << std::endl
+              << "  ";
+    for (int i = 0; i < leftMargin - 1; i++) {
+      std::cout << ' ';
+    }
+    for (int i = 0; i < 134; i++) {
+      std::cout << (const char)(196);
+    }
+    std::cout << std::endl;
+  }
 }
