@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="controller\controller.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model\databaseModel.cpp" />
     <ClCompile Include="view\consoleView.cpp" />
@@ -150,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="controller\controller.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="model\databaseModel.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="view\consoleView.h" />

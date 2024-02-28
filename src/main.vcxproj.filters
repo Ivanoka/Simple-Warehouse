@@ -48,6 +48,9 @@
     <ClCompile Include="view\winapiView.cpp">
       <Filter>Исходные файлы\View</Filter>
     </ClCompile>
+    <ClCompile Include="item.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -64,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="view\winapiView.h">
       <Filter>Файлы заголовков\View</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
