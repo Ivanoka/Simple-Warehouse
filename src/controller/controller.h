@@ -10,9 +10,12 @@
 #include "../model/databaseModel.h"
 #include "../view/consoleView.h"
 #include "../view/winapiView.h"
+#include "sqlite3.h"
 
 class Controller {
-private:
+ private:
+  sqlite3* db;
+
   DatabaseModel databaseModel;
   ConsoleView consoleView;
   WinAPIView winapiView;
@@ -33,6 +36,8 @@ private:
   void processInput();
 
  public:
+  Controller();
+  ~Controller();
   void init();
 };
 

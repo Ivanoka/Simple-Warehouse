@@ -1,5 +1,11 @@
 ﻿#include "controller.h"
 
+// Constructor / Destructor
+Controller::Controller() : db(nullptr) {}
+
+Controller::~Controller() { db = nullptr; }
+
+// Private
 void Controller::resizeEvent() {
   HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -14,6 +20,10 @@ void Controller::resizeEvent() {
       consoleWidth = csbi.dwSize.X;
 
       consoleView.showMenu();
+      if (this->db != nullptr) {
+        std::vector<Item>& itemList = databaseModel.getItemList(this->db);
+        consoleView.showListItems(itemList);
+      }
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -26,10 +36,19 @@ void Controller::processInput() {
   while (true) {
     switch (_getch()) {
       case SHORTCUTS::CTRL_O: {  // OPEN FILE
-        consoleView.showMenu();
+        if (databaseModel.openFile(this->db)) {
+          consoleView.showMenu();
+          std::vector<Item>& itemList = databaseModel.getItemList(this->db);
+          consoleView.showListItems(itemList);
+        }
         break;
       }
       case SHORTCUTS::CTRL_N: {  // NEW FILE
+        if (databaseModel.createFile(this->db)) {
+          consoleView.showMenu();
+          std::vector<Item>& itemList = databaseModel.getItemList(this->db);
+          consoleView.showListItems(itemList);
+        }
         break;
       }
       case SHORTCUTS::CTRL_M: {  // NEW PRODUCT
@@ -64,6 +83,7 @@ void Controller::processInput() {
   }
 }
 
+// Public
 void Controller::init() {
   std::thread threadResizeEvent(&Controller::resizeEvent, this);
   threadResizeEvent.detach();
