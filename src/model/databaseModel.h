@@ -1,13 +1,16 @@
 #ifndef DATABASEMODEL_H
 #define DATABASEMODEL_H
 
-// include
+#include <Windows.h>
+#include <CommCtrl.h>
+#include <Shlwapi.h>
+#include "sqlite3.h"
 
 class DatabaseModel {
 private:
 
 public:
-
+  bool openFile(sqlite3*&);
 };
 
-#endif // DATABASEMODEL_H
+#endif  // DATABASEMODEL_H
