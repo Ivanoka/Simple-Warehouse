@@ -1,5 +1,41 @@
 ﻿#include "databaseModel.h"
 
+bool DatabaseModel::isLatinChars(TCHAR* fileName, const DWORD& fileNameLength) {
+  // Linear search checks for file extension
+  for (DWORD i = 0; i < fileNameLength / 2; i++) {
+    if ((fileName[i] < 32 || fileName[i] > 127) && fileName[i] != 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+int DatabaseModel::callbackProductCount(void* data, int argc, char** argv,
+                                        char** colNames) {
+  // Write the result of the SQL query into a variable
+  int* count = static_cast<int*>(data);
+  *count = std::stoi(argv[0]);
+
+  return 0;
+}
+
+int DatabaseModel::callbackProductInfo(void* data, int argc, char** argv,
+                                       char** colNames) {
+  // Writing the result of SQL query into the variable quantity of products in
+  // the database
+  auto* productList = static_cast<std::vector<Item>*>(data);
+  Item itemInfo;
+
+  std::stringstream sstream(argv[0]);
+  sstream >> itemInfo.barcode;
+  itemInfo.name = argv[1];
+  itemInfo.stock = std::stoi(argv[2]);
+  itemInfo.changeTime = std::stoi(argv[3]);
+  productList->push_back(itemInfo);
+
+  return 0;
+}
 
 // Public
 bool DatabaseModel::openFile(sqlite3*& db) {
@@ -177,3 +213,44 @@ bool DatabaseModel::createFile(sqlite3*& db) {
   return false;
 }
 
+std::vector<Item>& DatabaseModel::getItemList(sqlite3*& db) {
+  // Array of items information
+  static std::vector<Item> itemList;
+  itemList.clear();
+  
+  // SQL query
+  std::string query = "SELECT COUNT(*) FROM items";
+
+  // Number of products in the database
+  int itemCount = 0;
+
+  // Sending a request
+  if (sqlite3_exec(db, query.c_str(), callbackProductCount, &itemCount,
+                   nullptr) != SQLITE_OK) {
+    MessageBox(nullptr,
+               L"Database reading error. You may be using a database that is "
+               L"not compatible with this program!",
+               L"Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+    sqlite3_close(db);
+    db = nullptr;
+    return itemList;
+  }
+
+  // SQL query
+  query =
+      "SELECT barcode, name, stock, change_time FROM items ORDER BY name";
+
+  // Sending a request
+  if (sqlite3_exec(db, query.c_str(), callbackProductInfo, &itemList,
+                   nullptr) != SQLITE_OK) {
+    MessageBox(nullptr,
+               L"Database reading error. You may be using a database that is "
+               L"not compatible with this program!",
+               L"Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+    sqlite3_close(db);
+    db = nullptr;
+    return itemList;
+  }
+
+  return itemList;
+}
