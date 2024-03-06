@@ -1,9 +1,12 @@
 ﻿#include "databaseModel.h"
 
+#include <iostream>
+
 // Private
-bool DatabaseModel::isLatinChars(TCHAR* fileName, const DWORD& fileNameLength) {
+bool DatabaseModel::isLatinChars(const TCHAR* fileName,
+                                 const size_t fileNameLength) const {
   // Linear search checks for file extension
-  for (DWORD i = 0; i < fileNameLength / 2; i++) {
+  for (size_t i = 0; i < fileNameLength / 2; i++) {
     if ((fileName[i] < 32 || fileName[i] > 127) && fileName[i] != 0) {
       return false;
     }
@@ -12,17 +15,19 @@ bool DatabaseModel::isLatinChars(TCHAR* fileName, const DWORD& fileNameLength) {
   return true;
 }
 
-int DatabaseModel::callbackProductCount(void* data, int argc, char** argv,
-                                        char** colNames) {
+int DatabaseModel::callbackProductCount(void* data, [[maybe_unused]] int argc,
+                                        char** argv,
+                                        [[maybe_unused]] char** colNames) {
   // Write the result of the SQL query into a variable
-  int* count = static_cast<int*>(data);
+  auto count = static_cast<int*>(data);
   *count = std::stoi(argv[0]);
 
   return 0;
 }
 
-int DatabaseModel::callbackProductInfo(void* data, int argc, char** argv,
-                                       char** colNames) {
+int DatabaseModel::callbackProductInfo(void* data, [[maybe_unused]] int argc,
+                                       char** argv,
+                                       [[maybe_unused]] char** colNames) {
   // Writing the result of SQL query into the variable quantity of products in
   // the database
   auto* productList = static_cast<std::vector<Item>*>(data);
@@ -39,7 +44,7 @@ int DatabaseModel::callbackProductInfo(void* data, int argc, char** argv,
 }
 
 std::vector<std::string> DatabaseModel::split(const std::string& str,
-                                              char delimiter) {
+                                              char delimiter) const {
   std::vector<std::string> tokens;
   std::istringstream tokenStream(str);
   std::string token;
@@ -50,7 +55,7 @@ std::vector<std::string> DatabaseModel::split(const std::string& str,
 }
 
 // Public
-bool DatabaseModel::openFile(sqlite3*& db) {
+bool DatabaseModel::openFile(sqlite3*& db) const {
   // Structure for storing file selection window parameters
   OPENFILENAME ofn;
   // Buffer to store the selected file path
@@ -66,13 +71,14 @@ bool DatabaseModel::openFile(sqlite3*& db) {
 
   bool isNonErrorDialog = false;
 
-  while (true) {
+  for (std::wstring wFileName;;) {
     // Opening the file selection window
     isNonErrorDialog = GetOpenFileName(&ofn);
+    wFileName = fileName;
 
     if (isNonErrorDialog) {
       // Check for the correct path to the file
-      if (!(isLatinChars(fileName, sizeof(fileName)))) {
+      if (!(isLatinChars(wFileName.c_str(), wFileName.size()))) {
         MessageBox(
             nullptr,
             L"Incorrect file path. You may be using non-Latin characters!",
@@ -82,22 +88,16 @@ bool DatabaseModel::openFile(sqlite3*& db) {
       }
 
       // Convert wchar array to char array
-      int size = WideCharToMultiByte(CP_ACP, 0, fileName, -1, nullptr, 0,
-                                     nullptr, nullptr);
-      char* charFileName = new char[size];
-      WideCharToMultiByte(CP_ACP, 0, fileName, -1, charFileName, size, nullptr,
-                          nullptr);
+      std::string charFileName(wFileName.begin(), wFileName.end());
 
       // Open a connection to a sdatabase file
-      sqlite3* testDb;
-      if (sqlite3_open(charFileName, &testDb) == SQLITE_OK) {
+      if (sqlite3 * testDb;
+          sqlite3_open(charFileName.c_str(), &testDb) == SQLITE_OK) {
         // If there is an open file, it must be safely closed
-        if (db != nullptr) {
-          sqlite3_close(db);
-        }
+        sqlite3_close(db);
 
         sqlite3_close(testDb);
-        sqlite3_open(charFileName, &(db));
+        sqlite3_open(charFileName.c_str(), &db);
       } else {
         // Handling database opening error
         MessageBox(nullptr,
@@ -107,8 +107,6 @@ bool DatabaseModel::openFile(sqlite3*& db) {
 
         continue;
       }
-
-      delete[] charFileName;
       return true;
     } else {
       return false;
@@ -118,7 +116,7 @@ bool DatabaseModel::openFile(sqlite3*& db) {
   return false;
 }
 
-bool DatabaseModel::createFile(sqlite3*& db) {
+bool DatabaseModel::createFile(sqlite3*& db) const {
   // Structure for storing file selection window parameters
   OPENFILENAME ofn;
   // Buffer to store the selected file path
@@ -134,13 +132,14 @@ bool DatabaseModel::createFile(sqlite3*& db) {
 
   bool isNonErrorDialog = false;
 
-  while (true) {
+  for (std::wstring wFileName;;) {
     // Opening the file selection window
     isNonErrorDialog = GetSaveFileName(&ofn);
 
     if (isNonErrorDialog) {
+      wFileName = fileName;
       // Check on an existing file
-      if (PathFileExists(fileName)) {
+      if (PathFileExists(wFileName.c_str())) {
         MessageBox(nullptr,
                    L"A file with this name already exists. Change the name of "
                    L"the file to be created and try again!",
@@ -150,7 +149,7 @@ bool DatabaseModel::createFile(sqlite3*& db) {
       }
 
       // Check for the correct path to the file
-      if (!(isLatinChars(fileName, sizeof(fileName)))) {
+      if (!(isLatinChars(wFileName.c_str(), wFileName.size()))) {
         MessageBox(
             nullptr,
             L"Incorrect file path. You may be using non-Latin characters!",
@@ -158,35 +157,22 @@ bool DatabaseModel::createFile(sqlite3*& db) {
 
         continue;
       }
-
       // Check for the .db file extension in the path
-      for (int i = 3; i < MAX_PATH - 2; i++) {
-        if (fileName[i] == 0 &&
-            (fileName[i - 1] != 98 && fileName[i - 2] != 100 &&
-             fileName[i - 3] != 46)) {
-          fileName[i] = 46;
-          fileName[i + 1] = 100;
-          fileName[i + 2] = 98;
-        }
+      if (wcscmp(PathFindExtension(wFileName.c_str()), L".db") != 0) {
+        wFileName.append(L".db");
       }
 
-      // Convert wchar array to char array
-      int size = WideCharToMultiByte(CP_ACP, 0, fileName, -1, nullptr, 0,
-                                     nullptr, nullptr);
-      auto* charFileName = new char[size];
-      WideCharToMultiByte(CP_ACP, 0, fileName, -1, charFileName, size, nullptr,
-                          nullptr);
+      // Convert wchar string to char string
+      std::string charFileName(wFileName.begin(), wFileName.end());
 
       // Open a connection to a database file
-      sqlite3* testDb;
-      if (sqlite3_open(charFileName, &testDb) == SQLITE_OK) {
+      if (sqlite3 * testDb;
+          sqlite3_open(charFileName.c_str(), &testDb) == SQLITE_OK) {
         // If there is an open file, it must be safely closed
-        if (db != nullptr) {
-          sqlite3_close(db);
-        }
+        sqlite3_close(db);
 
         sqlite3_close(testDb);
-        sqlite3_open(charFileName, &db);
+        sqlite3_open(charFileName.c_str(), &db);
       } else {
         // Handling database opening error
         MessageBox(nullptr,
@@ -211,11 +197,9 @@ bool DatabaseModel::createFile(sqlite3*& db) {
                    L"An unexpected error occurred while creating the file!",
                    L"Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
 
-        std::remove(charFileName);
+        charFileName.clear();
         continue;
       }
-
-      delete[] charFileName;
       return true;
     } else {
       return false;
@@ -234,11 +218,9 @@ std::vector<Item>& DatabaseModel::getItemList(sqlite3*& db) {
   std::string query = "SELECT COUNT(*) FROM items";
 
   // Number of products in the database
-  int itemCount = 0;
-
-  // Sending a request
-  if (sqlite3_exec(db, query.c_str(), callbackProductCount, &itemCount,
-                   nullptr) != SQLITE_OK) {
+  if (int itemCount = 0;
+      sqlite3_exec(db, query.c_str(), callbackProductCount, &itemCount,
+                   nullptr) != SQLITE_OK) {  // Sending a request
     MessageBox(nullptr,
                L"Database reading error. You may be using a database that is "
                L"not compatible with this program!",
@@ -266,7 +248,8 @@ std::vector<Item>& DatabaseModel::getItemList(sqlite3*& db) {
   return itemList;
 }
 
-bool DatabaseModel::newItem(sqlite3*& db, std::string insertQuery) {
+bool DatabaseModel::newItem(sqlite3*& db,
+                            const std::string& insertQuery) const {
   int execResult =
       sqlite3_exec(db, insertQuery.c_str(), nullptr, nullptr, nullptr);
 
@@ -283,7 +266,7 @@ bool DatabaseModel::newItem(sqlite3*& db, std::string insertQuery) {
   return true;
 }
 
-bool DatabaseModel::importCsv(sqlite3*& db) {
+bool DatabaseModel::importCsv(sqlite3*& db) const {
   // Structure for storing file selection window parameters
   OPENFILENAME ofn;
   // Buffer to store the selected file path
@@ -299,13 +282,14 @@ bool DatabaseModel::importCsv(sqlite3*& db) {
 
   bool isNonErrorDialog = false;
 
-  while (true) {
+  for (std::wstring wFileName;;) {
     // Opening the file selection window
     isNonErrorDialog = GetOpenFileName(&ofn);
+    wFileName = fileName;
 
     if (isNonErrorDialog) {
       // Check for the correct path to the file
-      if (!(isLatinChars(fileName, sizeof(fileName)))) {
+      if (!isLatinChars(wFileName.c_str(), wFileName.size())) {
         MessageBox(
             nullptr,
             L"Incorrect file path. You may be using non-Latin characters!",
@@ -314,17 +298,11 @@ bool DatabaseModel::importCsv(sqlite3*& db) {
         continue;
       }
 
-      // Convert wchar array to char array
-      int size = WideCharToMultiByte(CP_ACP, 0, fileName, -1, nullptr, 0,
-                                     nullptr, nullptr);
-      auto* charFileName = new char[size];
-      WideCharToMultiByte(CP_ACP, 0, fileName, -1, charFileName, size, nullptr,
-                          nullptr);
+      // Convert wchar string to char string
+      std::string charFileName(wFileName.begin(), wFileName.end());
 
-      // Open CSV file for reading
-      std::ifstream csvFile(charFileName);
-
-      if (csvFile.is_open()) {
+      if (std::ifstream csvFile(charFileName);
+          csvFile.is_open()) {  // Open CSV file for reading
         std::string line;
         getline(csvFile, line);  // Skip column headers
 
@@ -332,14 +310,16 @@ bool DatabaseModel::importCsv(sqlite3*& db) {
         const char* insertSQL =
             "INSERT INTO items (barcode, name, stock, change_time) VALUES "
             "(?, ?, ?, ?);";
-        sqlite3_stmt* stmt;
-        if (sqlite3_prepare_v2(db, insertSQL, -1, &stmt, 0) == SQLITE_OK) {
+
+        if (sqlite3_stmt * stmt; sqlite3_prepare_v2(db, insertSQL, -1, &stmt,
+                                                    nullptr) == SQLITE_OK) {
           // Read and insert data from a CSV file
           while (getline(csvFile, line)) {
             std::vector<std::string> fields = split(line, ';');
-            int paramIndex = 1;
+            int paramIndex = 0;
             for (const std::string& field : fields) {
-              sqlite3_bind_text(stmt, paramIndex++, field.c_str(), -1,
+              ++paramIndex;
+              sqlite3_bind_text(stmt, paramIndex, field.c_str(), -1,
                                 SQLITE_STATIC);
             }
             sqlite3_step(stmt);
@@ -364,7 +344,6 @@ bool DatabaseModel::importCsv(sqlite3*& db) {
         std::cerr << "Can't open CSV file" << std::endl;
       }
 
-      delete[] charFileName;
       return true;
     } else {
       return false;
@@ -374,7 +353,7 @@ bool DatabaseModel::importCsv(sqlite3*& db) {
   return false;
 }
 
-bool DatabaseModel::exportCsv(sqlite3*& db) {
+bool DatabaseModel::exportCsv(sqlite3*& db) const {
   // Structure for storing file selection window parameters
   OPENFILENAME ofn;
   // Buffer to store the selected file path
@@ -390,13 +369,14 @@ bool DatabaseModel::exportCsv(sqlite3*& db) {
 
   bool isNonErrorDialog = false;
 
-  while (true) {
+  for (std::wstring wFileName;;) {
     // Opening the file selection window
     isNonErrorDialog = GetSaveFileName(&ofn);
+    wFileName = fileName;
 
     if (isNonErrorDialog) {
       // Check on an existing file
-      if (PathFileExists(fileName)) {
+      if (PathFileExists(wFileName.c_str())) {
         MessageBox(nullptr,
                    L"A file with this name already exists. Change the name of "
                    L"the file to be created and try again!",
@@ -406,7 +386,7 @@ bool DatabaseModel::exportCsv(sqlite3*& db) {
       }
 
       // Check for the correct path to the file
-      if (!(isLatinChars(fileName, sizeof(fileName)))) {
+      if (!isLatinChars(wFileName.c_str(), wFileName.size())) {
         MessageBox(
             nullptr,
             L"Incorrect file path. You may be using non-Latin characters!",
@@ -416,29 +396,19 @@ bool DatabaseModel::exportCsv(sqlite3*& db) {
       }
 
       // Check for the .csv file extension in the path
-      for (int i = 4; i < MAX_PATH - 3; i++) {
-        if (fileName[i] == 0 &&
-            (fileName[i - 1] != 118 && fileName[i - 1] != 115 &&
-             fileName[i - 2] != 99 && fileName[i - 3] != 46)) {
-          fileName[i] = 46;
-          fileName[i + 1] = 99;
-          fileName[i + 2] = 115;
-          fileName[i + 3] = 118;
-        }
+      if (wcscmp(PathFindExtension(wFileName.c_str()), L".csv") != 0) {
+        wFileName.append(L".csv");
       }
 
-      // Convert wchar array to char array
-      int size = WideCharToMultiByte(CP_ACP, 0, fileName, -1, nullptr, 0,
-                                     nullptr, nullptr);
-      auto* charFileName = new char[size];
-      WideCharToMultiByte(CP_ACP, 0, fileName, -1, charFileName, size, nullptr,
-                          nullptr);
-
-      std::ofstream csvFile(charFileName);
+      // Convert wchar string to char string
+      std::string charFileName(wFileName.begin(), wFileName.end());
 
       const char* sql = "SELECT * FROM items;";
-      sqlite3_stmt* stmt;
-      if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) == SQLITE_OK) {
+
+      if (sqlite3_stmt * stmt;
+          sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+        std::ofstream csvFile(charFileName);
+
         // Writing column headers to a CSV file
         int columnCount = sqlite3_column_count(stmt);
         for (int i = 0; i < columnCount; ++i) {
@@ -452,8 +422,7 @@ bool DatabaseModel::exportCsv(sqlite3*& db) {
         // Writing data to a CSV file
         while (sqlite3_step(stmt) == SQLITE_ROW) {
           for (int i = 0; i < columnCount; ++i) {
-            const char* columnData =
-                reinterpret_cast<const char*>(sqlite3_column_text(stmt, i));
+            auto columnData = (const char*)sqlite3_column_text(stmt, i);
             csvFile << columnData;
             if (i < columnCount - 1) {
               csvFile << ";";
@@ -470,7 +439,6 @@ bool DatabaseModel::exportCsv(sqlite3*& db) {
                    MB_ICONERROR);
       }
 
-      delete[] charFileName;
       return true;
     } else {
       return false;

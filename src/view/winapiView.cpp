@@ -1,13 +1,12 @@
 ﻿#include "winapiView.h"
 
 LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
-                                         LPARAM lParam) {
+                                      LPARAM lParam) {
   static HWND hEditName;
   static HWND hEditBarcode;
   static HWND hEditStock;
 
-  std::string* buffer =
-      reinterpret_cast<std::string*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+  auto buffer = (std::string*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
   switch (msg) {
     case WM_PAINT: {
@@ -30,15 +29,15 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
     case WM_CREATE: {
       // Remove the WS_MINIMIZEBOX, WS_SIZEBOX and WS_MAXIMIZEBOX styles from
       // the window style
-      SetWindowLong(hwnd, GWL_STYLE,
-                    GetWindowLong(hwnd, GWL_STYLE) &
-                        ~(WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX));
+      SetWindowLongPtr(hwnd, GWL_STYLE,
+                       GetWindowLongPtr(hwnd, GWL_STYLE) &
+                           ~(WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX));
 
       // Setting the WS_EX_TOPMOST style for the window
       SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
       // Get the current settings of the system font metrics
-      NONCLIENTMETRICSW ncm;
+      NONCLIENTMETRICSW ncm{};
       ncm.cbSize = sizeof(NONCLIENTMETRICSW);
       SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICSW),
                             &ncm, 0);
@@ -46,7 +45,7 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
       // Getting the font height for system messages
       HDC hdc = GetDC(hwnd);
       HFONT hFont = CreateFontIndirectW(&ncm.lfMessageFont);
-      HFONT hOldFont = static_cast<HFONT>(SelectObject(hdc, hFont));
+      auto hOldFont = static_cast<HFONT>(SelectObject(hdc, hFont));
 
       // Release of resources
       SelectObject(hdc, hOldFont);
@@ -56,7 +55,7 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
       hEditName = CreateWindowW(
           L"EDIT", nullptr, WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL,
           21, 23, 300, 23, hwnd, nullptr, nullptr, nullptr);
-      SendMessage(hEditName, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), TRUE);
+      SendMessage(hEditName, WM_SETFONT, (WPARAM)(hFont), TRUE);
       SendMessage(hEditName, EM_SETLIMITTEXT, 94, 0);
       Edit_SetCueBannerText(hEditName, L"Product name");
 
@@ -65,8 +64,7 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
           L"EDIT", nullptr,
           WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER | ES_AUTOHSCROLL, 21,
           55, 100, 23, hwnd, nullptr, nullptr, nullptr);
-      SendMessage(hEditBarcode, WM_SETFONT, reinterpret_cast<WPARAM>(hFont),
-                  TRUE);
+      SendMessage(hEditBarcode, WM_SETFONT, (WPARAM)(hFont), TRUE);
       SendMessage(hEditBarcode, EM_SETLIMITTEXT, 13, 0);
       Edit_SetCueBannerText(hEditBarcode, L"Barcode");
 
@@ -75,8 +73,7 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
           L"EDIT", nullptr,
           WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER | ES_AUTOHSCROLL, 269,
           55, 52, 23, hwnd, nullptr, nullptr, nullptr);
-      SendMessage(hEditStock, WM_SETFONT, reinterpret_cast<WPARAM>(hFont),
-                  TRUE);
+      SendMessage(hEditStock, WM_SETFONT, (WPARAM)(hFont), TRUE);
       SendMessage(hEditStock, EM_SETLIMITTEXT, 5, 0);
       Edit_SetCueBannerText(hEditStock, L"Stock");
 
@@ -84,18 +81,16 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
       HWND hButtonAdd = CreateWindow(
           L"BUTTON", L"Add", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 167, 112,
           73, 23, hwnd, reinterpret_cast<HMENU>(1), nullptr, nullptr);
-      SendMessage(hButtonAdd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont),
-                  TRUE);
+      SendMessage(hButtonAdd, WM_SETFONT, (WPARAM)(hFont), TRUE);
 
       // Cancel button
       HWND hButtonCancel = CreateWindow(
           L"BUTTON", L"Cancel", WS_VISIBLE | WS_CHILD, 249, 112, 73, 23, hwnd,
           reinterpret_cast<HMENU>(2), nullptr, nullptr);
-      SendMessage(hButtonCancel, WM_SETFONT, reinterpret_cast<WPARAM>(hFont),
-                  TRUE);
+      SendMessage(hButtonCancel, WM_SETFONT, (WPARAM)(hFont), TRUE);
       break;
     }
-    case WM_COMMAND:
+    case WM_COMMAND: {
       if (LOWORD(wParam) == 1) {
         // Getting text from the input field
         wchar_t bufferName[256];
@@ -106,19 +101,20 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
         GetWindowTextW(hEditStock, bufferStock, 256);
 
         // Check that the input field is not empty
-        if (lstrlenW(bufferName) == 0) {
+
+        if (bufferName[0] == L'\0') {
           MessageBox(hwnd, L"The field for entering a name cannot be empty!",
                      L"Error", MB_ICONERROR);
           SetFocus(hEditName);
           return 0;
         }
-        if (lstrlenW(bufferBarcode) == 0) {
+        if (bufferBarcode[0] == L'\0') {
           MessageBox(hwnd, L"The field for entering a barcode cannot be empty!",
                      L"Error", MB_ICONERROR);
           SetFocus(hEditBarcode);
           return 0;
         }
-        if (lstrlenW(bufferStock) == 0) {
+        if (bufferStock[0] == L'\0') {
           MessageBox(hwnd, L"The field for entering a stock cannot be empty!",
                      L"Error", MB_ICONERROR);
           SetFocus(hEditStock);
@@ -126,8 +122,7 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
         }
 
         // Checking for non-Latin characters.
-        for (wchar_t i = 0; bufferName[i] != L'\0'; i++) {
-          wchar_t ch = bufferName[i];
+        for (size_t i = 0; bufferName[i] != L'\0'; ++i) {
           if (bufferName[i] < L' ' || bufferName[i] > L'~') {
             MessageBox(hwnd,
                        L"The Name field cannot contain non-Latin characters!",
@@ -138,7 +133,7 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
         }
 
         // Checking for correct barcode length
-        if (lstrlenW(bufferBarcode) != 13) {
+        if (wcslen(bufferBarcode) != 13) {
           MessageBox(hwnd, L"Enter a 13-digit barcode!", L"Error",
                      MB_ICONERROR);
           SetFocus(hEditBarcode);
@@ -153,37 +148,38 @@ LRESULT WinAPIView::windowProcNewItem(HWND hwnd, UINT msg, WPARAM wParam,
         std::string strBarcode(wstrBarcode.begin(), wstrBarcode.end());
         std::string strStock(wstrStock.begin(), wstrStock.end());
 
-        *buffer =
-            "INSERT INTO items VALUES "
-            "('" +
-            strBarcode + "', '" + strName + "', '" + strStock + "', '" +
-            std::to_string(time(NULL)) + "')";
-
+        *buffer = std::format(R"(INSERT INTO items VALUES
+   ('{}', '{}', '{}', '{}'))",
+                              strBarcode, strName, strStock, time(nullptr));
         DestroyWindow(hwnd);
       } else if (LOWORD(wParam) == 2) {
-        *buffer = "";
+        buffer->clear();
         DestroyWindow(hwnd);
       }
       break;
-    case WM_CLOSE:
-      *buffer = "";
+    }
+    case WM_CLOSE: {
+      buffer->clear();
       DestroyWindow(hwnd);
       break;
-    case WM_DESTROY:
+    }
+    case WM_DESTROY: {
       PostQuitMessage(0);
       break;
-    default:
+    }
+    default: {
       return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
   }
   return 0;
 }
 
-std::string WinAPIView::newItem() {
+std::string WinAPIView::newItem() const {
   std::string buffer = "";
 
   // Register window class
+  //HINSTANCE hInstance = GetModuleHandle(NULL);
   WNDCLASS wc = {0};
-  HINSTANCE hInstance = GetModuleHandle(NULL);
   wc.lpfnWndProc = windowProcNewItem;
   wc.hInstance = GetModuleHandle(nullptr);
   // wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MY_ICON));
@@ -194,9 +190,9 @@ std::string WinAPIView::newItem() {
   int y = GetSystemMetrics(SM_CYSCREEN) / 2 - 96;
 
   // Creating a window
-  HWND hwnd = CreateWindow(wc.lpszClassName, L"Adding a new product",
-                           WS_OVERLAPPEDWINDOW, x, y, 359, 184, nullptr,
-                           nullptr, wc.hInstance, &buffer);
+  HWND hwnd = CreateWindowExW(0, wc.lpszClassName, L"Adding a new product",
+                              WS_OVERLAPPEDWINDOW, x, y, 359, 184, nullptr,
+                              nullptr, wc.hInstance, &buffer);
   if (!hwnd) {
     MessageBox(nullptr, L"Window creation error!", L"Error",
                MB_TOPMOST | MB_ICONERROR | MB_OK);
@@ -204,7 +200,7 @@ std::string WinAPIView::newItem() {
   }
 
   // Set db pointer to custom window data
-  SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&buffer));
+  SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)(&buffer));
 
   // Display window
   ShowWindow(hwnd, SW_SHOWNORMAL);

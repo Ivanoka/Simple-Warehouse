@@ -1,9 +1,8 @@
 ﻿#include "controller.h"
 
 // Constructor / Destructor
-Controller::Controller() : db(nullptr) {}
 
-Controller::~Controller() { db = nullptr; }
+Controller::~Controller() { sqlite3_close_v2(db); }
 
 // Private
 void Controller::resizeEvent() {
@@ -21,8 +20,7 @@ void Controller::resizeEvent() {
 
       consoleView.showMenu();
       if (this->db != nullptr) {
-        std::vector<Item>& itemList = databaseModel.getItemList(this->db);
-        consoleView.showListItems(itemList);
+        consoleView.showListItems(databaseModel.getItemList(this->db));
       }
     }
 
@@ -30,7 +28,7 @@ void Controller::resizeEvent() {
   }
 }
 
-bool Controller::unopenFile() {
+bool Controller::isFileOpen() const {
   if (this->db == nullptr) {
     MessageBox(
         nullptr,
@@ -63,10 +61,10 @@ void Controller::processInput() {
         break;
       }
       case SHORTCUTS::CTRL_M: {  // NEW ITEM
-        if (!unopenFile()) break;
-        do {
-          std::string insertQuery = winapiView.newItem();
-          if (insertQuery != "") {
+        if (!isFileOpen()) break;
+        while (true) {
+          if (std::string insertQuery = winapiView.newItem();
+              !insertQuery.empty()) {
             if (databaseModel.newItem(db, insertQuery)) {
               consoleView.showMenu();
               std::vector<Item> itemList = databaseModel.getItemList(this->db);
@@ -76,11 +74,11 @@ void Controller::processInput() {
           } else {
             break;
           }
-        } while (true);
+        }
         break;
       }
       case SHORTCUTS::CTRL_I: {  // IMPORT CSV
-        if (!unopenFile()) break;
+        if (!isFileOpen()) break;
         if (databaseModel.importCsv(db)) {
           consoleView.showMenu();
           std::vector<Item> itemList = databaseModel.getItemList(this->db);
@@ -89,7 +87,7 @@ void Controller::processInput() {
         break;
       }
       case SHORTCUTS::CTRL_U: {  // EXPORT CSV
-        if (!unopenFile()) break;
+        if (!isFileOpen()) break;
         databaseModel.exportCsv(db);
         break;
       }
@@ -118,7 +116,7 @@ void Controller::processInput() {
 
 // Public
 void Controller::init() {
-  std::thread threadResizeEvent(&Controller::resizeEvent, this);
+  std::jthread threadResizeEvent(&Controller::resizeEvent, this);
   threadResizeEvent.detach();
 
   processInput();

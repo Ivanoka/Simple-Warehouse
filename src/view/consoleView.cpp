@@ -1,7 +1,8 @@
 ﻿#include "consoleView.h"
+#include <iostream>
 
 // Private
-size_t ConsoleView::getLeftMargin() {
+size_t ConsoleView::getLeftMargin() const {
   HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
   // Get window width
@@ -17,7 +18,7 @@ size_t ConsoleView::getLeftMargin() {
 }
 
 // Public
-void ConsoleView::showMenu() {
+void ConsoleView::showMenu() const {
   size_t leftMargin = getLeftMargin();
   std::string separator(134, static_cast<const char>(205));
   std::string margin(leftMargin, ' ');
@@ -67,11 +68,11 @@ void ConsoleView::showMenu() {
             << static_cast<const char>(188) << std::endl;
 }
 
-void ConsoleView::showListItems(std::vector<Item>& itemList) {
+void ConsoleView::showListItems(const std::vector<Item>& itemList) const {
   size_t leftMargin = getLeftMargin();
   std::string leftMarginStr(getLeftMargin(), ' ');
 
-  std::vector<std::string> columnNames{
+  std::array<std::string, 3> columnNames{
       std::string(1, static_cast<const char>(201)) +
           std::string(15, static_cast<const char>(205)) +
           std::string(1, static_cast<const char>(203)) +
@@ -101,7 +102,7 @@ void ConsoleView::showListItems(std::vector<Item>& itemList) {
           std::string(1, static_cast<const char>(188)),
   };
 
-  for (auto str : columnNames) {
+  for (const auto& str : columnNames) {
     std::cout << leftMarginStr << str << std::endl;
   }
 
@@ -111,22 +112,22 @@ void ConsoleView::showListItems(std::vector<Item>& itemList) {
   struct tm curChangeTime;
 
   // Output the list of products as a loop
-  for (auto item : itemList) {
+  for (const auto& item : itemList) {
     unixChangeTime = item.changeTime;
     localtime_s(&curChangeTime, &unixChangeTime);
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d", &curChangeTime);
 
-    for (int i = 0; i < leftMargin; i++) {
+    for (size_t i = 0; i < leftMargin; i++) {
       std::cout << ' ';
     }
     std::cout << "  " << item.barcode << "   " << std::left << std::setw(94)
               << item.name << "   " << std::right << std::setw(5) << item.stock
               << "   " << std::setw(11) << buffer << std::endl
               << "  ";
-    for (int i = 0; i < leftMargin - 1; i++) {
+    for (size_t i = 0; i < leftMargin - 1; i++) {
       std::cout << ' ';
     }
-    for (int i = 0; i < 134; i++) {
+    for (size_t i = 0; i < 134; i++) {
       std::cout << (const char)(196);
     }
     std::cout << std::endl;
