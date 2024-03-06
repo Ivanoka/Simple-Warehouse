@@ -30,6 +30,17 @@ void Controller::resizeEvent() {
   }
 }
 
+bool Controller::unopenFile() {
+  if (this->db == nullptr) {
+    MessageBox(
+        nullptr,
+        L"The database file is not open. Open or create a file and try again.",
+        L"Error", MB_TOPMOST | MB_ICONERROR | MB_OK);
+    return false;
+  }
+  return true;
+}
+
 void Controller::processInput() {
   consoleView.showMenu();
 
@@ -47,11 +58,21 @@ void Controller::processInput() {
         if (databaseModel.createFile(this->db)) {
           consoleView.showMenu();
           std::vector<Item>& itemList = databaseModel.getItemList(this->db);
+      case SHORTCUTS::CTRL_M: {  // NEW ITEM
+        if (!unopenFile()) break;
+        do {
+          std::string insertQuery = winapiView.newItem();
+          if (insertQuery != "") {
+            if (databaseModel.newItem(db, insertQuery)) {
+              consoleView.showMenu();
+              std::vector<Item> itemList = databaseModel.getItemList(this->db);
           consoleView.showListItems(itemList);
+              break;
         }
+          } else {
         break;
       }
-      case SHORTCUTS::CTRL_M: {  // NEW PRODUCT
+        } while (true);
         break;
       }
       case SHORTCUTS::CTRL_I: {  // IMPORT CSV

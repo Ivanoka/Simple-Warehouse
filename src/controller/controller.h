@@ -7,9 +7,9 @@
 #include <chrono>
 #include <thread>
 
+#include "../view/winapiView.h"
 #include "../model/databaseModel.h"
 #include "../view/consoleView.h"
-#include "../view/winapiView.h"
 #include "sqlite3.h"
 
 class Controller {
@@ -33,6 +33,7 @@ class Controller {
   };
 
   void resizeEvent();
+  bool unopenFile();
   void processInput();
 
  public:
