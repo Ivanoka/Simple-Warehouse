@@ -5,14 +5,12 @@
 #include <CommCtrl.h>
 #include <Shlwapi.h>
 
+#include <codecvt>
 #include <fstream>
-#include <iostream>
+#include <iosfwd>
 #include <locale>
 #include <memory>
 #include <sstream>
-#include <string>
-#include <locale>
-#include <codecvt>
 #include <vector>
 
 #include "../item.h"
@@ -20,20 +18,20 @@
 
 class DatabaseModel {
  private:
-  bool isLatinChars(TCHAR* fileName, const DWORD& fileNameLength);
+  bool isLatinChars(const TCHAR* fileName, const size_t fileNameLength) const;
   static int callbackProductCount(void* data, int argc, char** argv,
                                   char** colNames);
   static int callbackProductInfo(void* data, int argc, char** argv,
                                  char** colNames);
-  std::vector<std::string> split(const std::string&, char);
+  std::vector<std::string> split(const std::string&, char) const;
 
  public:
-  bool openFile(sqlite3*&);
-  bool createFile(sqlite3*&);
+  bool openFile(sqlite3*&) const;
+  bool createFile(sqlite3*&) const;
   std::vector<Item>& getItemList(sqlite3*&);
-  bool newItem(sqlite3*&, std::string);
-  bool importCsv(sqlite3*&);
-  bool exportCsv(sqlite3*&);
+  bool newItem(sqlite3*&, const std::string&) const;
+  bool importCsv(sqlite3*&) const;
+  bool exportCsv(sqlite3*&) const;
 };
 
 #endif  // DATABASEMODEL_H

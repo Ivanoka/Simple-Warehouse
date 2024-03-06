@@ -14,7 +14,7 @@
 
 class Controller {
  private:
-  sqlite3* db;
+  sqlite3* db = nullptr;
 
   DatabaseModel databaseModel;
   ConsoleView consoleView;
@@ -32,12 +32,11 @@ class Controller {
     ESC = 27,
   };
 
-  void resizeEvent();
-  bool unopenFile();
+  DECLSPEC_NORETURN void resizeEvent();
+  bool isFileOpen() const;
   void processInput();
 
  public:
-  Controller();
   ~Controller();
   void init();
 };
