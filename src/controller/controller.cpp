@@ -49,7 +49,7 @@ void Controller::processInput() {
       case SHORTCUTS::CTRL_O: {  // OPEN FILE
         if (databaseModel.openFile(this->db)) {
           consoleView.showMenu();
-          std::vector<Item>& itemList = databaseModel.getItemList(this->db);
+          std::vector<Item> itemList = databaseModel.getItemList(this->db);
           consoleView.showListItems(itemList);
         }
         break;
@@ -57,7 +57,11 @@ void Controller::processInput() {
       case SHORTCUTS::CTRL_N: {  // NEW FILE
         if (databaseModel.createFile(this->db)) {
           consoleView.showMenu();
-          std::vector<Item>& itemList = databaseModel.getItemList(this->db);
+          std::vector<Item> itemList = databaseModel.getItemList(this->db);
+          consoleView.showListItems(itemList);
+        }
+        break;
+      }
       case SHORTCUTS::CTRL_M: {  // NEW ITEM
         if (!unopenFile()) break;
         do {
@@ -66,28 +70,36 @@ void Controller::processInput() {
             if (databaseModel.newItem(db, insertQuery)) {
               consoleView.showMenu();
               std::vector<Item> itemList = databaseModel.getItemList(this->db);
-          consoleView.showListItems(itemList);
+              consoleView.showListItems(itemList);
               break;
-        }
+            }
           } else {
-        break;
-      }
+            break;
+          }
         } while (true);
         break;
       }
       case SHORTCUTS::CTRL_I: {  // IMPORT CSV
+        if (!unopenFile()) break;
+        if (databaseModel.importCsv(db)) {
+          consoleView.showMenu();
+          std::vector<Item> itemList = databaseModel.getItemList(this->db);
+          consoleView.showListItems(itemList);
+        }
         break;
       }
       case SHORTCUTS::CTRL_U: {  // EXPORT CSV
+        if (!unopenFile()) break;
+        databaseModel.exportCsv(db);
         break;
       }
       case SHORTCUTS::CTRL_R: {  // AVAILABILITY
         break;
       }
-      case SHORTCUTS::CTRL_E: {  // EDIT PRODUCT
+      case SHORTCUTS::CTRL_E: {  // EDIT ITEM
         break;
       }
-      case SHORTCUTS::CTRL_D: {  // DELETE PRODUCT
+      case SHORTCUTS::CTRL_D: {  // DELETE ITEM
         break;
       }
       case SHORTCUTS::ESC: {  // EXIT

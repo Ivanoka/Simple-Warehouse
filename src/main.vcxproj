@@ -24,7 +24,7 @@
     <ProjectGuid>{13f66f99-c439-4a7a-a634-4b28cb911a06}</ProjectGuid>
     <RootNamespace>main</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>summerCoursework2023</ProjectName>
+    <ProjectName>SimpleWarehouse</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

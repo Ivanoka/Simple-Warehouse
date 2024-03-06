@@ -5,9 +5,14 @@
 #include <CommCtrl.h>
 #include <Shlwapi.h>
 
+#include <fstream>
+#include <iostream>
+#include <locale>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <locale>
+#include <codecvt>
 #include <vector>
 
 #include "../item.h"
@@ -20,11 +25,15 @@ class DatabaseModel {
                                   char** colNames);
   static int callbackProductInfo(void* data, int argc, char** argv,
                                  char** colNames);
+  std::vector<std::string> split(const std::string&, char);
 
  public:
   bool openFile(sqlite3*&);
   bool createFile(sqlite3*&);
   std::vector<Item>& getItemList(sqlite3*&);
+  bool newItem(sqlite3*&, std::string);
+  bool importCsv(sqlite3*&);
+  bool exportCsv(sqlite3*&);
 };
 
 #endif  // DATABASEMODEL_H
